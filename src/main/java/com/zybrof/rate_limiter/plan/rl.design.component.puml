@@ -1,0 +1,83 @@
+@startuml
+'https://plantuml.com/component-diagram
+
+
+'package "Some Group" {
+'  HTTP - [First Component]
+'  [Another Component]
+'}
+'
+'node "Other Groups" {
+'  FTP - [Second Component]
+'  [First Component] ..> FTP
+'}
+'
+'cloud {
+'  [Example 1]
+'}
+'
+'
+'database "MySql" {
+'  folder "This is my folder" {
+'    [Folder 3]
+'  }
+'  frame "Foo" {
+'    [Frame 4]
+'  }
+'}
+'
+'
+'[Another Component] ..> [Example 1]
+'[Example 1] ..> [Folder 3]
+'[Folder 3] ..> [Frame 4]
+
+node Client {
+}
+
+() Gateway
+
+node Server {
+    [RateLimiter]
+    database Redis
+    note bottom
+        - **INCR** key
+        - **EXPIRE** key seconds
+    end note
+    [RateLimiter] <---> Redis: manage counters
+
+    node Webservers {
+        [ServerA]
+        [ServerB]
+    }
+
+    package Config {
+        [Cache]
+        [Workers]
+        [Rules]
+        note bottom
+            domain: auth
+                action: login
+                    limit:
+                        unit: minute
+                        unit_count: 1
+                        max: 5
+
+        end note
+        [RateLimiter] <-- [Cache]: read Rules
+        [Workers] <-- [Rules]: read Rules
+        [Workers] --> [Cache]: put Rules
+    }
+}
+
+'Gateway --- Server
+
+Client ---> Gateway: send request
+Gateway ---> RateLimiter: check request
+RateLimiter ---> Webservers #green: **<font color=green>success**: route request
+
+RateLimiter ...> Gateway #red: **<font color=red>fail**: route request
+Gateway ...> Client #red: **<font color=red>fail**: 429
+
+
+
+@enduml
