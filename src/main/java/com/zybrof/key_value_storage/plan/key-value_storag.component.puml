@@ -1,0 +1,21 @@
+@startuml
+'https://plantuml.com/component-diagram
+[Client]
+
+node "Server" {
+    [Coordinator]
+    [Cache]
+    database DB {
+    }
+    [Cache] --> DB: Ask value
+    [Cache] <.. DB: Provide value
+
+    [Coordinator] --> [Cache]: Ask value
+    [Coordinator] <.. [Cache]: Provide value
+    [Cache] --> DB: Flush values
+}
+
+[Client] --> [Coordinator]: put(key, value)
+[Client] <.. [Coordinator]: get(key)
+
+@enduml
