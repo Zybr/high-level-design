@@ -1,0 +1,18 @@
+### Create a shortening
+POST http://localhost:8080/shorten
+Content-Type: application/json
+
+{
+  "url": "https://www.jetbrains.com"
+}
+
+> {%
+  client.global.set("code", response.body.code);
+%}
+
+### Redirect to the original URL
+# Reuse the code from the previous request response
+GET http://localhost:8080/shorten/{{code}}
+
+### Health Check
+GET http://localhost:8080/health

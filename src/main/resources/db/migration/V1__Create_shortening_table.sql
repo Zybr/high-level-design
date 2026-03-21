@@ -1,0 +1,5 @@
+CREATE TABLE shortening (
+    id BIGSERIAL PRIMARY KEY,
+    url VARCHAR(2048) NOT NULL,
+    code VARCHAR(10) UNIQUE
+);

@@ -17,16 +17,16 @@ services:
       timeout: 5s
       retries: 5
 
-  # Spring Boot application service
-  hld_api:
-    build: .
-    container_name: hld_api
-    ports:
-      - "8080:8080"
-    depends_on:
-      hld_db:
-        condition: service_healthy
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://hld_db:5432/hld_db
-      SPRING_DATASOURCE_USERNAME: user
-      SPRING_DATASOURCE_PASSWORD: password
+#  # Spring Boot application service
+#  hld_api:
+#    build: .
+#    container_name: hld_api
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      hld_db:
+#        condition: service_healthy
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://hld_db:5432/hld_db
+#      SPRING_DATASOURCE_USERNAME: user
+#      SPRING_DATASOURCE_PASSWORD: password
