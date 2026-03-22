@@ -1,8 +1,9 @@
 package com.zybrof.url_shortener.controller;
 
-import com.zybrof.url_shortener.dto.ShorteningInpDto;
-import com.zybrof.url_shortener.dto.ShorteningOutDto;
-import com.zybrof.url_shortener.service.Shortener;
+import com.zybrof.url_shortener.src.controller.ShortenerController;
+import com.zybrof.url_shortener.src.dto.ShorteningInpDto;
+import com.zybrof.url_shortener.src.dto.ShorteningOutDto;
+import com.zybrof.url_shortener.src.service.Shortener;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

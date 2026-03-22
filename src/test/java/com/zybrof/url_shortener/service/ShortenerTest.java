@@ -1,10 +1,12 @@
 package com.zybrof.url_shortener.service;
 
-import com.zybrof.url_shortener.config.ShorteningProperties;
-import com.zybrof.url_shortener.dto.ShorteningInpDto;
-import com.zybrof.url_shortener.dto.ShorteningOutDto;
-import com.zybrof.url_shortener.entity.Shortening;
-import com.zybrof.url_shortener.repository.ShorteningRepository;
+import com.zybrof.url_shortener.src.config.ShorteningProperties;
+import com.zybrof.url_shortener.src.dto.ShorteningInpDto;
+import com.zybrof.url_shortener.src.dto.ShorteningOutDto;
+import com.zybrof.url_shortener.src.entity.Shortening;
+import com.zybrof.url_shortener.src.repository.ShorteningRepository;
+import com.zybrof.url_shortener.src.service.Encoder;
+import com.zybrof.url_shortener.src.service.Shortener;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

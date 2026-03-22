@@ -1,4 +1,4 @@
-package com.zybrof.url_shortener.config;
+package com.zybrof.url_shortener.src.config;
 
 import lombok.Getter;
 import lombok.Setter;

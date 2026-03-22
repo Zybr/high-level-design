@@ -1,5 +1,6 @@
 package com.zybrof.url_shortener.service;
 
+import com.zybrof.url_shortener.src.service.Encoder;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

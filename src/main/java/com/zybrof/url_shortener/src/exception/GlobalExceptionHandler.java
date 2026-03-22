@@ -1,4 +1,4 @@
-package com.zybrof.url_shortener.exception;
+package com.zybrof.url_shortener.src.exception;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

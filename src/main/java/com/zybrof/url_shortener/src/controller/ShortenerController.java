@@ -1,8 +1,8 @@
-package com.zybrof.url_shortener.controller;
+package com.zybrof.url_shortener.src.controller;
 
-import com.zybrof.url_shortener.dto.ShorteningInpDto;
-import com.zybrof.url_shortener.dto.ShorteningOutDto;
-import com.zybrof.url_shortener.service.Shortener;
+import com.zybrof.url_shortener.src.dto.ShorteningInpDto;
+import com.zybrof.url_shortener.src.dto.ShorteningOutDto;
+import com.zybrof.url_shortener.src.service.Shortener;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;

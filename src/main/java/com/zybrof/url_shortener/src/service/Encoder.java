@@ -1,4 +1,4 @@
-package com.zybrof.url_shortener.service;
+package com.zybrof.url_shortener.src.service;
 
 public class Encoder {
     private final String ALPHABET;

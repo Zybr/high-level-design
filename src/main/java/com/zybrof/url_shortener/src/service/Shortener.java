@@ -1,10 +1,10 @@
-package com.zybrof.url_shortener.service;
+package com.zybrof.url_shortener.src.service;
 
-import com.zybrof.url_shortener.config.ShorteningProperties;
-import com.zybrof.url_shortener.dto.ShorteningInpDto;
-import com.zybrof.url_shortener.dto.ShorteningOutDto;
-import com.zybrof.url_shortener.entity.Shortening;
-import com.zybrof.url_shortener.repository.ShorteningRepository;
+import com.zybrof.url_shortener.src.config.ShorteningProperties;
+import com.zybrof.url_shortener.src.dto.ShorteningInpDto;
+import com.zybrof.url_shortener.src.dto.ShorteningOutDto;
+import com.zybrof.url_shortener.src.entity.Shortening;
+import com.zybrof.url_shortener.src.repository.ShorteningRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,6 @@
-package com.zybrof.url_shortener.config;
+package com.zybrof.url_shortener.src.config;
 
-import com.zybrof.url_shortener.service.Encoder;
+import com.zybrof.url_shortener.src.service.Encoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

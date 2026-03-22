@@ -1,6 +1,6 @@
-package com.zybrof.url_shortener.repository;
+package com.zybrof.url_shortener.src.repository;
 
-import com.zybrof.url_shortener.entity.Shortening;
+import com.zybrof.url_shortener.src.entity.Shortening;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

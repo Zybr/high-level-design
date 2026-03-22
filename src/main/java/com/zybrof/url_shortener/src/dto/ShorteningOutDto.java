@@ -1,4 +1,4 @@
-package com.zybrof.url_shortener.dto;
+package com.zybrof.url_shortener.src.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.zybrof.url_shortener.config;
+package com.zybrof.url_shortener.src.config;
 
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Configuration;

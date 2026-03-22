@@ -1,4 +1,4 @@
-package com.zybrof.url_shortener.entity;
+package com.zybrof.url_shortener.src.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
