@@ -1,4 +1,4 @@
-package com.zybrof.rate_limiter.sliding_window_log;
+package com.zybrof.rate_limiter.src.sliding_window_log;
 
 import com.zybrof.rate_limiter.src.sliding_window_log.SlidingWindowLogRateLimiter;
 import org.junit.jupiter.api.Test;

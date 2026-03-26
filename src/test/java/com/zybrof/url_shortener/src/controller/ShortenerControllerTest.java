@@ -1,4 +1,4 @@
-package com.zybrof.url_shortener.controller;
+package com.zybrof.url_shortener.src.controller;
 
 import com.zybrof.url_shortener.src.controller.ShortenerController;
 import com.zybrof.url_shortener.src.dto.ShorteningInpDto;

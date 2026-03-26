@@ -1,4 +1,4 @@
-package com.zybrof.rate_limiter.bucket;
+package com.zybrof.rate_limiter.src.bucket;
 
 import com.zybrof.rate_limiter.src.bucket.BucketRateLimiter;
 import org.junit.jupiter.api.Test;

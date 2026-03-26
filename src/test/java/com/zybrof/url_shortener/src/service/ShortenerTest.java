@@ -1,4 +1,4 @@
-package com.zybrof.url_shortener.service;
+package com.zybrof.url_shortener.src.service;
 
 import com.zybrof.url_shortener.src.config.ShorteningProperties;
 import com.zybrof.url_shortener.src.dto.ShorteningInpDto;
