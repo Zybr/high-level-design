@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
-@EnableJpaRepositories(basePackages = "com.zybrof.url_shortener.repository")
-@EntityScan(basePackages = "com.zybrof.url_shortener.entity")
+@EnableJpaRepositories(basePackages = "com.zybrof.url_shortener.src.repository")
+@EntityScan(basePackages = "com.zybrof.url_shortener.src.entity")
 public class JpaConfig {
 }
