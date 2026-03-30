@@ -1,0 +1,30 @@
+@startuml
+
+entity users {
+    + id: UUID
+    + firstName: Sting
+    + lastName: String
+    + email: String
+    + phoneNumber: String
+}
+
+
+enum channels {
+    email = 1 = 001
+    sms = 2 = 010
+    mobile_app = 100
+}
+note bottom
+Examples:
+    email & sms = 011 = 3
+    sms & mobile_app = 010 & 100 = 110 = 6
+end note
+
+entity user_settings {
+    + user_id: UUID
+    + channels: &channels
+}
+user_settings -- users: 1 .. 1
+user_settings *-- channels
+
+@enduml

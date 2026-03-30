@@ -1,0 +1,123 @@
+@startuml
+left to right direction
+
+package Senders {
+    [InnerServerX]
+    [AuthUserX]
+}
+
+package Notifiers {
+    [NotifierX]
+    [RateLimiter]
+    [Authentification]
+    NotifierX -l[hidden]- RateLimiter
+    RateLimiter -l[hidden]- Authentification
+}
+note left of Notifiers
+POST /notification
+    {
+        from: {
+            userId: 89ec5fcc-5b39-4e4f-a2f5-99279741bcbb,
+        },
+        to: {
+            userId: "a81bc81b-dead-4e5d-abff-90865d1e13b1,
+        },
+        title: "Limited-Time & Flash Sales"
+        content: [
+            {
+                type: text/plant
+                body: Weekend Only! Get {{percentage}}% off all items. Use code {{code}} at checkout.
+            }
+        ]
+    }
+end note
+
+[UserCache]
+
+database UserStorage {
+'    [users]
+'    [user_channels]
+'    [user_settings]
+}
+
+package NotificationsQueues {
+    queue IosNotifications
+    queue AndroidNotifications
+    queue SmsNotifications
+    queue EmailNotifications
+
+    IosNotifications -l[hidden]- AndroidNotifications
+    AndroidNotifications -l[hidden]- SmsNotifications
+    SmsNotifications -l[hidden]- EmailNotifications
+}
+
+package Postmen {
+    [IosPostman]
+    [AndroidPostman]
+    [SmsPostman]
+    [EmailPostman]
+
+    [IosPostman] -l[hidden]- [AndroidPostman]
+    [AndroidPostman] -l[hidden]- [SmsPostman]
+    [SmsPostman] -l[hidden]- [EmailPostman]
+}
+
+database TemplateStorage {
+}
+
+package Channels {
+    [IosPusher]
+    [AndroidPusher]
+    [SmsSender]
+    [EmailSender]
+
+    [IosPusher] -l[hidden]- [AndroidPusher]
+    [AndroidPusher] -l[hidden]- [SmsSender]
+    [SmsSender] -l[hidden]- [EmailSender]
+}
+
+() app
+() phone
+() email
+[User]
+app -- [User]
+phone -- [User]
+email -- [User]
+
+[InnerServerX] --> Notifiers: Create message
+[AuthUserX] --> Notifiers: Create message
+
+Notifiers <.. [UserCache]: Get user with settings
+[UserCache] <.. UserStorage
+
+Notifiers --> IosNotifications: Put Notification
+Notifiers --> AndroidNotifications: Put Notification
+Notifiers --> SmsNotifications: Put Notification
+Notifiers --> EmailNotifications: Put Notification
+
+Postmen <.. TemplateStorage: Get templates
+Postmen --> Postmen: Format message
+
+IosNotifications ..> IosPostman: Get Notification
+AndroidNotifications ..> AndroidPostman: Get Notification
+SmsNotifications ..> SmsPostman: Get Notification
+EmailNotifications ..> EmailPostman: Get Notification
+
+IosNotifications <-- IosPostman: Retry on error
+AndroidNotifications <-- AndroidPostman: Retry on error
+SmsNotifications <-- SmsPostman: Retry on error
+EmailNotifications <-- EmailPostman: Retry on error
+
+IosPostman --> [IosPusher]: Send formatted message
+AndroidPostman --> [AndroidPusher]: Send formatted message
+SmsPostman --> [SmsSender]: Send formatted message
+EmailPostman --> [EmailSender]: Send formatted message
+
+[IosPusher] --> app
+[AndroidPusher] --> app
+[SmsSender] --> phone
+[EmailSender] --> email
+
+
+
+@enduml
