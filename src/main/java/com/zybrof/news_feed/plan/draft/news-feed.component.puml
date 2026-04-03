@@ -1,0 +1,106 @@
+@startuml
+'https://plantuml.com/component-diagram
+
+left to right direction
+
+package Services {
+    [ServiceA]
+    [ServiceB]
+}
+
+[Publisher]
+note bottom
+POST /activity
+    {
+        author: {
+            id: UUID
+        }
+        object: {
+            id: UUID,
+            type: Post | Comment | Like | Dislike | ...
+        }
+        action: Create | Update | Delete
+    }
+end note
+
+queue ActivityQueue
+
+[Fanout]
+
+node FeedCache
+
+node UserCache
+
+UserCache <-- UserStorage
+
+database UserStorage {
+    [Users]
+    [UserRelations]
+    [UserRelations] -* [Users]
+}
+
+database ContentStorage {
+    [Post]
+    [Comment]
+    [Vote]
+    [Comment] -* [Post]
+    [Post] o-[Vote]
+    [Comment] o- [Vote]
+}
+
+[Provider]
+note bottom
+GET /feeds
+    [
+        {
+            author: {
+                id: UUID
+                username: String
+            }
+            object: {
+                id: UUID,
+                type: Post | Comment | Like | Dislike
+                content: [
+                    {
+                        type: text/plant,
+                        payload: Text
+                    },
+                    {
+                        type: video/mpg4,
+                        link: https://youtube.com/path/to-file
+                    }
+                ]
+            }
+            action: Create | Update | Delete
+        }
+    ]
+end note
+
+node Gateway {
+    [RateLimiter]
+    [Authorization]
+}
+
+[User]
+
+[CDN]
+
+Services ..> [Publisher]: Create activity on data changing
+
+[Publisher] --> ActivityQueue: Push Activity
+
+ActivityQueue ..> [Fanout]: Pop Activity
+
+[Fanout] <.. UserCache: Read User relations
+[Fanout] --> FeedCache: Create Feeds for each related User
+
+ContentStorage ..> [Provider]: Get Content
+FeedCache ..> [Provider]: Get Feed
+UserCache ..> [Provider]: Get User
+
+[Provider] ..> [Gateway]: Get User Feed
+
+[Gateway] ..> [User]: Get Feeds
+[CDN] ..> [User]: Get content
+
+@enduml

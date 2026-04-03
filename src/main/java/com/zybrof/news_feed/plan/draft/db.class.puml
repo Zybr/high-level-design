@@ -1,0 +1,88 @@
+@startuml
+
+entity users {
+    * id: UUID
+    * username: String <<Unique>>
+}
+
+entity user_relations {
+    * user_from_id: UUID
+    * user_to_id: UUID
+    * type: relation_type
+}
+user_relations *-- relation_type
+
+enum relation_type {
+    Follower
+    Friend
+}
+
+entity posts {
+    * id: UUID
+    * text: String
+    * author_id: UUID
+}
+
+entity comments {
+    * id: UUID
+    * text: String
+    * author_id: UUID
+    * message_type: message_type
+    * message_id: UUID
+}
+comments o-- message_type
+
+enum message_type {
+    Post
+    Comment
+}
+
+entity votes {
+    * id: UUID
+    * type: vote_type
+    * message_type: message_type
+    * message_id: UUID
+}
+votes *-- vote_type
+votes o-- message_type
+
+enum vote_type {
+    Like
+    Dislike
+}
+
+user_relations ||--|| users: from
+user_relations ||--|| users: to
+
+users ||--o{ posts
+users ||--o{ comments
+
+posts ||--o{ comments
+posts ||--o{ votes
+comments ||--o{ comments
+comments ||--o{ votes
+
+
+entity feeds {
+   + author_id: UUID
+   + object_type: object_type
+   + object_id: UUID
+   + action: action_type
+}
+feeds *-- object_type
+feeds *-- action_type
+
+enum object_type {
+    Post
+    Comment
+    Like
+    Dislike
+}
+
+enum action_type {
+    Create
+    Update
+    Delete
+}
+
+@enduml
