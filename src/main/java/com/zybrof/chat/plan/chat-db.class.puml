@@ -1,0 +1,42 @@
+@startuml
+
+entity user {
+    * id: UUID
+    * username: String
+    * email: String
+}
+
+entity channel {
+    * id: UUID
+    * name: String, <<Unique>>
+    * owner_id: UUID
+}
+channel ||--|| user: owner_id
+
+entity channel_user {
+    * channel_id: UUID
+    * user_id: UUID
+    ---
+    channel_id & user_id: <<Unique>>
+}
+channel ||--|{ channel_user: channel_id
+channel_user ||--|| user: user_id
+
+entity message {
+    * id: UUID
+    * channel_id: UUID
+    * author_id: UUID
+    * text: String
+}
+message ||--|| user: author_id
+
+entity channel_message {
+    * channel_id: UUID
+    * message_id: UUID
+    ---
+    channel_id & message_id: <<Unique>>
+}
+channel ||--|{ channel_message: channel_id
+channel_message ||--|| message: message_id
+
+@enduml

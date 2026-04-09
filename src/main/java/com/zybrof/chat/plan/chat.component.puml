@@ -1,0 +1,79 @@
+@startuml
+left to right direction
+
+package Users {
+    [UserX]
+'    [UserA]
+'    [UserB]
+'    [UserC]
+'    [UserA] -l[hidden]- [UserB]
+'    [UserB] -l[hidden]- [UserC]
+}
+note left {
+    Each user has ID of the last message
+}
+
+package System {
+    [Gateway]
+    [Balancer]
+    [Gateway] --> [Balancer]
+
+    package StatelessServers {
+        [Authorization]
+        [ChatServerDiscover]
+    }
+    [Balancer] --> [Authorization]
+    [Balancer] --> [ChatServerDiscover]
+
+    package StateFullServers {
+        package ChatServers {
+            [ChatServerX]
+        }
+
+        package StatusServers {
+            [StatusServerX]
+        }
+    }
+    [ChatServerDiscover] --> ChatServers: Choose a server
+
+    database UserStatus_KV
+    [StatusServerX] <--> UserStatus_KV: Manages user statuses
+    JSON userStatuses {
+        "users": {
+            "5b63b2fb-4c7d-4357-ba0f-911c40aa6480": {
+                "status": "online",
+                "lastSeen": 1775578549189
+            }
+        }
+    }
+    UserStatus_KV *-l- userStatuses
+
+    [Authorization] --> StatusServers: \n - Login: {status: "online"} \n - Logout: {status: "offline"}
+
+    database User_Rel
+    [Authorization] <.. User_Rel
+
+    queue UserMessages {
+        queue UserXMessages
+    }
+    [ChatServerX] <--> UserMessages: \n - Push message \n - Get messages from ID > *
+
+    [PushNotifier] --> Users: Push message
+    [ChatServerX] <.. StatusServers: Get user status
+    [ChatServerX] --> [PushNotifier]: IF user status = "offline" THEN push message
+}
+
+
+() ChatWebSocket
+ChatWebSocket -- ChatServers
+
+() StatusWebSocket
+StatusWebSocket -- StatusServers
+
+Users <--> [Gateway]: \n - Login \n - Logout \n - Get chat server
+Users <--> ChatWebSocket: \n - Send message \n - Receive message
+
+Users --> StatusWebSocket: \n - Ping (periodically)
+Users <.. StatusWebSocket: \n - Check user status
+
+@enduml
