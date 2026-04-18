@@ -1,0 +1,107 @@
+@startuml
+
+'left to right direction
+
+[User]
+
+package Searchers {
+    [SearcherX]
+}
+
+database Logs
+note right
+{query: t, time: [timestamp]}
+{query: to, time: [timestamp]}
+{query: tea, time: [timestamp]}
+{query: t, time: [timestamp]}
+{query: ted, time: [timestamp]}
+end note
+
+package Aggregators {
+    [AggregatorX]
+}
+
+package Providers {
+    [ProviderX]
+}
+
+package Builders {
+    [BuilderX]
+}
+
+database ComplementTree_Doc
+
+database ComplementTreeCash_KV
+
+database Query_Rel
+note right
+to - 321
+tea - 125
+ted - 163
+ten - 203
+end note
+
+'to tea ted ten'
+json QueryTrie {
+    "t": {
+        "val": "t",
+        "count": 0,
+        "children": {
+            "o": {
+                "count": 321,
+                "val": "to",
+                "children": {
+                }
+            },
+            "e": {
+                "val": "te",
+                "count": 0,
+                "children": {
+                    "a": {
+                        "val": "tea",
+                        "count": 125,
+                        "children": {
+                        }
+                    },
+                    "d": {
+                        "val": "ted",
+                        "count": 163,
+                        "children": {
+                        }
+                    },
+                    "d": {
+                        "val": "ten",
+                        "count": 203,
+                        "children": {
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+note right
+to
+tea
+ted
+ten
+end note
+
+ComplementTree_Doc *-- QueryTrie
+
+[User] <--> Providers: Send part of query => Get complements
+[User] <--> Searchers: Send full query => Get result
+
+Logs ..> Aggregators: Read logs
+Aggregators --> Query_Rel: Save query
+
+Providers <.. ComplementTreeCash_KV: Get complement
+Searchers --> Logs: Push query
+
+Query_Rel ..> Builders: Red query
+Builders --> ComplementTree_Doc: Update tree
+
+ComplementTreeCash_KV <.. ComplementTree_Doc: Get complement
+
+
+@enduml
