@@ -1,0 +1,88 @@
+@startuml
+'left to right direction
+
+[Client]
+
+cloud CDN
+note left
+GET /videos/{videoId}/segment/{segmentInx}[.extension] - Get video segment
+GET /thumbnails/{videoId} - Get video thumbnail
+end note
+
+[Gateway]
+note left
+POST /videos - Register uploading video => Get uploading URL
+end note
+
+[Auth]
+
+[SourceHandler]
+
+cloud SourceStorage
+
+queue EncodingQueue
+note left
+    - dead-letter
+    - retry
+end note
+
+[Transcoder]
+note left
+(360, 720, 1024)
+end note
+
+cloud EncodedStorage
+cloud ThumbnailStorage
+
+queue PublishingQueue
+
+[Publisher]
+
+database MetaStorage
+note left
+- Initial
+    - title
+    - description
+    - owner
+    - created_at
+    - status: pending | uploaded | encoded | ready | failed
+- Extra
+    - duration
+    - thumbnail
+end note
+
+database MetaCache
+
+
+[Client] --> [Gateway]: \n - Login \n - Provide video initial info
+[Gateway] ..> [Client]: \n - Get pre-signed URL \n - Get video meta \n - Get token
+[Gateway] --> [Coordinator]: Provide video initial info
+
+[Gateway] --> [Auth]: Login
+[Auth] ..> [Gateway]: Get token
+
+[Coordinator] ..> [Gateway]: Get pre-signed
+[Coordinator] --> MetaStorage: Set video initial meta
+
+[Client] --> [SourceStorage]: Upload source video by pre-signed URL
+
+[SourceStorage] ..> [SourceHandler]: Get file storing event
+[SourceHandler] --> EncodingQueue: Push encoding task
+
+EncodingQueue ..> [Transcoder]: Get encoding task
+SourceStorage ..> [Transcoder]: Get video
+[Transcoder] --> EncodedStorage: Save encoded video chunks
+[Transcoder] --> ThumbnailStorage: Save thumbnail
+EncodedStorage ..> CDN: Get encoded videos
+[Transcoder] --> PublishingQueue: Push publishing task
+
+PublishingQueue ..> [Publisher]: Get publishing task
+[Publisher] --> MetaStorage: Update video metadata
+
+MetaStorage ..> MetaCache: Cache video meta
+
+MetaCache ..> [Gateway]: Get video meta
+
+CDN ..> [Client]: Stream video (HLS, DASH, ABR)
+
+@enduml
