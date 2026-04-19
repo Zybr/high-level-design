@@ -1,0 +1,51 @@
+@startuml
+'left to right direction
+
+[Client]#yellow
+
+[LoadBalancer]
+
+package Blocker {
+    [Splitter] --> [Splitter]: Split file on blocks
+    note left: Later only caning blocks are synced
+    [Compressor] --> [Compressor]: Compress blocks
+    note left: Reduces size
+    [Encoder] --> [Encoder]: Encode blocks
+    note left: Keeps security
+    [Splitter] --> [Compressor]
+    [Compressor] --> [Encoder]
+}
+
+cloud BlobStorage
+
+cloud ColdStorage
+
+[ApiServer]
+
+database MetaStorage
+note left: Map files<->blocks
+
+database MetaCache
+
+[Informer]
+
+queue OfflineMessageQueue
+
+[Client] <--> [LoadBalancer]: \n - Upload file \n - Get file meta \n - Get file blocks \n - Upload file blocks
+[LoadBalancer] <--> Blocker: \n - Upload file \n - Get file blocks \n - Upload blocks
+[Blocker] --> BlobStorage: \n - Save blocks \n - Get blocks
+BlobStorage --> ColdStorage: Save unused files
+
+BlobStorage --> [ApiServer]: Inform about changes
+[ApiServer] --> MetaStorage: Update meta
+[ApiServer] <--> MetaCache: \n - Update meta \n - Read meta
+
+[LoadBalancer] <.. [ApiServer]: \n - Get meta
+
+[ApiServer] --> [Informer]: Inform about changes
+
+[Informer] --> [Client]: [Long pulling] \n - Send change message
+
+[Informer] <--> OfflineMessageQueue: \n - Save change message \n - Read message
+
+@enduml

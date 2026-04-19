@@ -1,0 +1,43 @@
+@startuml
+
+entity user {
+    + id: UUID
+    + username: String
+}
+
+entity file {
+    + id: UUID
+    + owner_id: UUID
+    + path: String
+    + is_folder: boolean
+    + type: MemoType
+    + size: Int
+    + created_at: Timestamp
+}
+user ||--|{ file: owner_id
+
+entity version {
+    + id: UUID
+    + file_id: UUID
+    + device_id: UUID
+    + version: Int
+    + created_at: Timestamp
+}
+file ||--|{ version: file_id
+
+entity block {
+    + id: UUID
+    + version_id: UUID
+    + order: Int
+}
+version ||--|{ block: version_id
+
+entity device {
+    + id: UUID
+    + owner_id: UUID
+    + name: String
+}
+user ||--|{ device: owner_id
+device ||--|{ version: device_id
+
+@enduml
