@@ -1,0 +1,20 @@
+@startuml
+
+entity business {
+    + id: UUID
+    + name: String
+    + country: String
+    + city: String
+    + address: String
+    + latitude: Int
+    + longitude: Int
+    + opened_at: Timestamp
+}
+
+entity business_geohash {
+    + business_id: UUID
+    + geohash: String
+}
+business_geohash ||--|| business
+
+@enduml

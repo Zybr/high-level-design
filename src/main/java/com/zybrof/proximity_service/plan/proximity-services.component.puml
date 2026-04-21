@@ -1,0 +1,62 @@
+@startuml
+
+[User]
+
+[BusinessOwner]
+
+[Gateway]
+note left
+- Balancer
+- RateLimiter
+- Auth
+end note
+
+[SearchService]
+note left
+GET /businesses
+    Request
+        - latitude
+        - longitude
+        - radius
+    Response
+        - businesses: [{...}]
+        - count
+end note
+
+database Geohash_KVDB
+
+database Business_KVDB
+
+[Updater]
+
+[BusinessService]
+note left
+- GET /businesses (filter by owner)
+- GET /businesses/{id}
+- POST /businesses
+- PUT /businesses/{id}
+- DELETE /businesses/{id}
+end note
+
+database Business_RDB {
+    database Business_RDB_Write
+    database Business_RDB_Read
+    Business_RDB_Write --> Business_RDB_Read: Update
+}
+
+[User] <--> [Gateway]: \n - Search \n - Get businesses
+
+[Gateway] <--> [SearchService]: \n - Search \n - Get businesses
+
+[SearchService] <.. Geohash_KVDB: Read Business IDs by area: \n location, radius
+[SearchService] <.. Business_KVDB: Read Business details by IDs
+
+[BusinessOwner] --> [Gateway]: Manage Business: \n - Create \n - Update \n - Remove
+[Gateway] --> [BusinessService]: Manage Business
+[BusinessService] --> Business_RDB_Write: Manage Business
+
+Business_RDB_Read ..> [Updater]: Read Business Location
+Business_KVDB <-- [Updater]: Update Business
+Geohash_KVDB <-- [Updater]: Update Locations
+
+@enduml
