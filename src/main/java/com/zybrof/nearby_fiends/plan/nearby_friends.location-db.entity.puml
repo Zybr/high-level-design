@@ -1,0 +1,54 @@
+@startuml
+
+legend bottom
+|= Color |= Meaning |
+|<#FFCC99>| Corrected existing element |
+|<#C6EFCE>| Newly added element |
+endlegend
+
+entity latest_location #FFCC99 {
+    * user_id: UUID <PK>
+    + latitude: Decimal(9,6)
+    + longitude: Decimal(9,6)
+    + geohash: String
+    + accuracy_m: Int
+    + updated_at: Timestamp
+    + expires_at: Timestamp
+}
+
+entity location_history #C6EFCE {
+    * user_id: UUID <PK>
+    * bucket_day: Date <PK>
+    * recorded_at: Timestamp <PK>
+    + latitude: Decimal(9,6)
+    + longitude: Decimal(9,6)
+    + geohash: String
+    + accuracy_m: Int
+    + source: String
+}
+
+entity geo_cell_membership #C6EFCE {
+    * cell_id: String <PK>
+    * user_id: UUID <PK>
+    + expires_at: Timestamp
+}
+
+note right of latest_location
+Latest visible position per user.
+Stored in the active-location store with TTL.
+end note
+
+note right of location_history
+Append-only history for analytics,
+support, and optional replay.
+end note
+
+note right of geo_cell_membership
+Supports fast "nearby active users"
+lookups by geospatial bucket.
+end note
+
+latest_location ||--|| geo_cell_membership : indexed into
+latest_location ||--o{ location_history : snapshots
+
+@enduml

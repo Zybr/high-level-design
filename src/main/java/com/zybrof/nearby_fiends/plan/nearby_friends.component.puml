@@ -1,0 +1,107 @@
+@startuml
+left to right direction
+
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+
+legend bottom
+|= Color |= Meaning |
+|<#FFCC99>| Corrected existing element |
+|<#C6EFCE>| Newly added element |
+endlegend
+
+[Client]
+note left: Mobile app
+
+package EdgeCluster {
+    [LoadBalancer]#C6EFCE
+    [Gateway]#FFCC99
+    note right
+    - Auth
+    - Rate limiter
+    - HTTP API routing
+    - WebSocket upgrade
+    end note
+}
+
+package UserServiceCluster {
+    [UserService] #FFCC99
+}
+
+package RealtimeCluster {
+    [LocationService] #FFCC99
+    [PresenceService] #C6EFCE
+}
+
+database UserStorage #FFCC99
+note right of UserStorage
+PostgreSQL
+- users
+- canonical friendships
+- privacy settings
+- block list
+end note
+
+database FriendGraphCache #C6EFCE
+note right of FriendGraphCache
+Redis cache
+- confirmed friends only
+- hot-path friend reads
+end note
+
+database ActiveLocationStore #C6EFCE
+note right of ActiveLocationStore
+Redis GEO + TTL
+- latest location per user
+- active presence window
+end note
+
+database LocationHistoryStorage #FFCC99
+note right of LocationHistoryStorage
+Cassandra
+- append-only history
+- time-bucketed partitions
+end note
+
+queue LiveUpdateBus #C6EFCE {
+    queue NearbyLocationEvents
+}
+note right of LiveUpdateBus
+Best-effort Pub/Sub
+- not source of truth
+- latest-state notifications only
+end note
+
+[Client] <---> [LoadBalancer]
+[LoadBalancer] <---> [Gateway]
+
+[Gateway] <--> [UserService] : HTTPS\nmanage users and friendships
+[UserService] <--> UserStorage : read/write users, friendships, privacy
+[UserService] --> FriendGraphCache : refresh confirmed-friend cache
+
+[Gateway] <--> [PresenceService] : WebSocket session lifecycle
+note on link
+- Connect / reconnect
+- Heartbeat
+- Session registration
+- Targeted push to active clients
+end note
+
+[Gateway] <--> [LocationService] : HTTPS / WebSocket\nlocation updates
+note on link
+- Update location
+  > latitude, longitude, accuracy
+- Fetch nearby active friends
+  < latest visible friend locations
+end note
+
+[LocationService] <.. FriendGraphCache : get confirmed friends
+[LocationService] --> ActiveLocationStore : upsert latest location + TTL
+[LocationService] --> LocationHistoryStorage : append sampled history
+[LocationService] --> LiveUpdateBus : publish latest-state change
+
+[PresenceService] <.. ActiveLocationStore : query nearby active friends
+[PresenceService] <.. LiveUpdateBus : consume best-effort updates
+[PresenceService] --> Gateway : push visible friend updates
+
+@enduml

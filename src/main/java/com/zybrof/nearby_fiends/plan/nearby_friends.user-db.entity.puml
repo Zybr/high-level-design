@@ -1,0 +1,74 @@
+@startuml
+
+legend bottom
+|= Color |= Meaning |
+|<#FFCC99>| Corrected existing element |
+|<#C6EFCE>| Newly added element |
+endlegend
+
+entity user #FFCC99 {
+    * id: UUID <PK>
+    + username: String <Unique>
+    + email: String <Unique>
+    + password_hash: String
+    + created_at: Timestamp
+    + status: String
+}
+
+entity friendship #FFCC99 {
+    * user_low_id: UUID <FK>
+    * user_high_id: UUID <FK>
+    + status: String
+    + requested_by_user_id: UUID
+    + created_at: Timestamp
+    + accepted_at: Timestamp
+    ....
+    user_low_id & user_high_id: <<Unique>>
+}
+
+entity user_privacy_settings #C6EFCE {
+    * user_id: UUID <PK, FK>
+    + visibility_mode: String
+    + precise_location_enabled: Boolean
+    + location_ttl_seconds: Int
+    + share_while_offline: Boolean
+}
+
+entity blocked_user #C6EFCE {
+    * blocker_user_id: UUID <FK>
+    * blocked_user_id: UUID <FK>
+    + created_at: Timestamp
+}
+
+enum friendship_status {
+    + Pending
+    + Confirmed
+    + Declined
+}
+
+enum visibility_mode {
+    + Hidden
+    + Approximate
+    + Precise
+}
+
+user ||--|| user_privacy_settings : user_id
+user ||--o{ friendship : user_low_id
+user ||--o{ friendship : user_high_id
+user ||--o{ blocked_user : blocker_user_id
+user ||--o{ blocked_user : blocked_user_id
+
+friendship *-- friendship_status
+user_privacy_settings *-- visibility_mode
+
+note right of friendship
+Store each friendship once using
+canonical ordering:
+min(user_id), max(user_id)
+end note
+
+note right of blocked_user
+Hard deny read access to location data.
+end note
+
+@enduml
