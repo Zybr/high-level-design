@@ -1,0 +1,38 @@
+flowchart LR
+    Mobile
+%% Navigation
+    Navigator
+    GeocodingDB[Geocoding DB]
+    Geocoder
+%% Router
+    RoutePlanner[Route Planer]
+%% Navigation Filter
+    Ranker
+    Filter
+%% Short path
+    PathShorter[Path Shoter]
+    TitlesDb[(Routing Tiles \n Object Storage)]
+%% Traffic
+    Estimator[ETA Service]
+    TrafficDb[(Traffic DB)]
+    TrafficUpdater[Traffic Updater]
+    LocationDB[(Location DB)]
+%% Traffic changes
+    EtaAdapter[Adaptive ETA and Rerouting]
+    ActiveUsersDB[(Active Users DB)]
+%% Relations
+    Mobile --> Navigator
+    Navigator --> Geocoder
+    Geocoder --> GeocodingDB
+    Navigator --> RoutePlanner
+    RoutePlanner --> Ranker
+    Ranker --> Filter
+    RoutePlanner --> PathShorter
+    PathShorter --> TitlesDb
+    RoutePlanner --> EtaAdapter
+    EtaAdapter --> TrafficDb
+    TrafficUpdater --> LocationDB
+    EtaAdapter --> ActiveUsersDB
+    TrafficUpdater --> TrafficDb
+    RoutePlanner --> Estimator
+
