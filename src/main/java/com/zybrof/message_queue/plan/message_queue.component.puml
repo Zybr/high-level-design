@@ -1,0 +1,85 @@
+@startuml
+'https://plantuml.com/component-diagram
+
+
+node Producer <<Multiple>> {
+}
+
+package Broker <<Scalable>> {
+    package PartitionA <<Multiple>> {
+        queue TopicAA <<Multiple>> {
+            [mAA1]
+            [mAA2]
+        }
+        queue TopicAB <<Multiple>> {
+            [mAB1]
+            [mAB2]
+        }
+    }
+    package PartitionB <<Multiple>> {
+        queue TopicBA <<Multiple>> {
+            [mBA1]
+            [mBA2]
+        }
+        queue TopicBB <<Multiple>> {
+            [mBB1]
+            [mBB2]
+        }
+    }
+}
+
+database Messages_BlobStorage {
+}
+
+package Consumer <<Scalable>> {
+    node ConsumerGroupA {
+        [ConsumerA1]
+        [ConsumerA2]
+        [ConsumerA1] --> [ConsumerA1]: As leader: Define consuming schema
+    }
+    node ConsumerGroupB {
+        [ConsumerB1]
+        [ConsumerB2]
+    }
+}
+
+JSON Message {
+    "meta": {
+        "partitionKey": "(?) {user-id}#{order-di}",
+        "tags": ["user", "payment"]
+    },
+    "payload": {
+        "entity": {
+            "id": "...",
+            "name": "..."
+        },
+        "action": "created"
+    }
+}
+
+node Controller {
+    database Config_RDB {
+    }
+}
+note left of Controller
+Config:
+    - Broker
+        - Replication factor
+        - Number of partitions
+Functions:
+    - Failure discovery
+    - Leader election
+    - Keeping consuming schema
+end note
+
+Producer --> Message: Push
+Message --> Broker
+Broker --> Messages_BlobStorage: Write Ahead Log
+
+[TopicAA] ..> [ConsumerA1]: Pop message
+[TopicBA] ..> [ConsumerB1]: Pop message
+
+Controller <--> Broker: \n - Failure discovery \n - Leader election
+Controller <--> Consumer: \n - Failure discovery \n - Leader election \n- Keeping consuming schema
+
+@enduml
